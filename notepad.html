@@ -212,8 +212,9 @@
     <!-- Toolbar -->
     <div class="toolbar">
         <!-- File Operations -->
-        <button onclick="saveFile()" title="Save File">💾 Save</button>
-        <button onclick="openFile()" title="Open File">📂 Open</button>
+        <button onclick="newFile()" title="New File (Ctrl+N)">📄 New</button>
+        <button onclick="saveFile()" title="Save File (Ctrl+S)">💾 Save</button>
+        <button onclick="openFile()" title="Open File (Ctrl+O)">📂 Open</button>
         <button onclick="downloadFile()" title="Download">⬇️ Download</button>
 
         <div class="separator"></div>
@@ -285,7 +286,8 @@
         // Initialize with first tab
         function initializeTabs() {
             addNewTab();
-            loadFromLocalStorage();
+            // Don't auto-load from localStorage on startup
+            // User can use Open button to load saved files
         }
 
         // Add new tab
@@ -433,6 +435,22 @@
         function changeTextColor() {
             const color = document.getElementById('textColor').value;
             formatDoc('foreColor', color);
+        }
+
+        // New File - Clear everything and start fresh
+        function newFile() {
+            if (tabs.length > 0 && tabs[0].content !== '<p>Start typing here...</p>') {
+                if (!confirm('Create new file? Current work will be cleared unless saved.')) {
+                    return;
+                }
+            }
+
+            // Clear all tabs and start fresh
+            tabs = [];
+            currentTabIndex = 0;
+            tabIdCounter = 0;
+            addNewTab();
+            updateStatus('New file created');
         }
 
         // Save file (Download as HTML)
@@ -598,6 +616,10 @@
                     case 'u':
                         e.preventDefault();
                         formatDoc('underline');
+                        break;
+                    case 'n':
+                        e.preventDefault();
+                        newFile();
                         break;
                     case 's':
                         e.preventDefault();
